@@ -1,1 +1,1 @@
-# redmine_gitlab_integration
+# An example of redmine and gitlab integration
