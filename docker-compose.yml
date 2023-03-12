@@ -1,0 +1,54 @@
+version: '3.6'
+services:
+  web:
+    image: zhukovmisha/my_gitlab_1502:15.0.2-ce.0
+    restart: always
+    hostname: 'gitlab.example.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.example.com'
+        gitlab_rails['gitlab_shell_ssh_port'] = 22
+    ports:
+      - '80:80'
+      - '22:22'
+    volumes:
+      - gitlab_config:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+    shm_size: '256m'
+  redmine:
+    image: zhukovmisha/redmine:5.0.4.stable
+    restart: always
+    ports:
+      - 8080:3000
+    environment:
+      REDMINE_DB_MYSQL: db
+      REDMINE_DB_PASSWORD: example
+      REDMINE_SECRET_KEY_BASE: example
+    volumes:
+      - redmine_volume:/usr/src/example
+      - gitlab_config:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+    networks:
+      - net
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: example
+      LANG: C.UTF-8
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_volume:/var/lib/mysql
+    networks:
+      - net
+networks:
+  net:
+volumes:
+  redmine_volume:
+  mysql_volume:
+  gitlab_config:
+  gitlab_logs:
+  gitlab_data:
